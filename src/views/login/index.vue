@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       loginForm: {
-        mobile: '13800000002',
+        mobile: '13800000004',
         password: '123456',
       },
       loginRules: {
