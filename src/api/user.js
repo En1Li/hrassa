@@ -7,3 +7,16 @@ export function login(data) {
     data,
   })
 }
+
+export const getUserInfoApi = () => {
+  return request({
+    method: 'POST',
+    url: '/sys/profile',
+  })
+}
+
+export const getUserDatail = (id) => {
+  return request({
+    url: '/sys/user/' + id,
+  })
+}
