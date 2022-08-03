@@ -19,8 +19,8 @@ const store = new Vuex.Store({
       reducer(state) {
         return {
           // return 出来的就是要存到localstorage里面的
-          user: {
-            token: state.user.token,
+          user: {  //user模块名
+            token: state.user.token,  //要存的键值对 名字要一致 插件会自动找
           },
         }
       },
