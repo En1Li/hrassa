@@ -1,5 +1,10 @@
 <template>
-  <el-dialog @close="closeFn" title="提示" :visible="visible" width="50%">
+  <el-dialog
+    @close="closeFn"
+    :title="dialogTitle"
+    :visible="visible"
+    width="50%"
+  >
     <el-form
       :model="formData"
       :rules="formRules"
@@ -48,7 +53,12 @@
 </template>
 
 <script>
-import { getDeptsApi, addDevalopment } from '@/api/departments'
+import {
+  getDeptsApi,
+  addDevalopment,
+  getDeptById,
+  editDeptById,
+} from '@/api/departments'
 import { getemployeesList } from '@/api/employees'
 export default {
   props: {
@@ -73,13 +83,26 @@ export default {
         name: [
           { required: true, message: '请输入部门名称', trigger: 'blur' },
           {
-            validator: (rule, value, callback) => {
-              if (!this.currentNode.children) return callback()
-              const isReplt = this.currentNode.children.some((item) => {
-                return item.name === value.trim()
-              })
-              if (isReplt) return callback(new Error('部门重复'))
-              callback()
+            validator: async (rule, value, callback) => {
+              if (this.formData.id) {
+                const { depts } = await getDeptsApi()
+                const filtersDepts = depts.filter(
+                  (item) =>
+                    item.pid === this.formData.pid &&
+                    item.id !== this.formData.id,
+                )
+                const isRepeat = filtersDepts.some(
+                  (item) => item.name === value,
+                )
+                isRepeat ? callback(new Error('部门重复')) : callback()
+              } else {
+                if (!this.currentNode.children) return callback()
+                const isReplt = this.currentNode.children.some((item) => {
+                  return item.name === value.trim()
+                })
+                if (isReplt) return callback(new Error('部门重复'))
+                callback()
+              }
             },
             trigger: 'blur',
           },
@@ -89,7 +112,14 @@ export default {
           {
             validator: async (rule, value, callback) => {
               const { depts } = await getDeptsApi()
-              const idRepeat = depts.some((item) => item.code === value)
+              let idRepeat
+              if (this.formData.id) {
+                idRepeat = depts
+                  .filter((item) => item.id !== this.formData.id)
+                  .some((item) => item.code === value)
+              } else {
+                idRepeat = depts.some((item) => item.code === value)
+              }
               idRepeat ? callback(new Error('部门编码重复')) : callback()
             },
           },
@@ -104,6 +134,11 @@ export default {
     }
   },
 
+  computed: {
+    dialogTitle() {
+      return this.formData.id ? '编辑部门' : '添加部门'
+    },
+  },
   created() {
     this.getemployeesList()
   },
@@ -111,19 +146,40 @@ export default {
   methods: {
     async getemployeesList() {
       const res = await getemployeesList()
-      console.log(res)
       this.employeesList = res
     },
     closeFn() {
       this.$emit('update:visible', false)
+      this.$refs.form.resetFields()
+      this.formData = {
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '', // 部门介绍
+      }
     },
     async onSave() {
-      await this.$refs.form.validate()
-      this.formData.pid = this.currentNode.id
-      await addDevalopment(this.formData)
-      this.closeFn()
-      await this.$emit('addSuccess')
-      this.$message.success('添加成功')
+      try {
+        if (this.formData.id) {
+          await editDeptById(this.formData)
+           this.$message.success('编辑成功')
+            this.closeFn()
+            this.$emit('addSuccess')
+        } else {
+          await this.$refs.form.validate()
+          this.formData.pid = this.currentNode.id
+          await addDevalopment(this.formData)
+          this.closeFn()
+          await this.$emit('addSuccess')
+          this.$message.success('添加成功')
+        }
+      } catch (error) {
+        this.$message.error('操作部门失败')
+      }
+    },
+    async getDeptById(id) {
+      // console.log(this.currentNode);
+      this.formData = await getDeptById(id)
     },
   },
 }

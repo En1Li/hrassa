@@ -13,7 +13,11 @@
               <el-dropdown-item @click.native="$emit('add', treeNode)"
                 >添加部门</el-dropdown-item
               >
-              <el-dropdown-item v-if="!isRoot">编辑部门</el-dropdown-item>
+              <el-dropdown-item
+                v-if="!isRoot"
+                @click.native="$emit('edit', treeNode)"
+                >编辑部门</el-dropdown-item
+              >
               <el-dropdown-item v-if="!isRoot" @click.native="onRemove"
                 >删除部门</el-dropdown-item
               >

@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class="app-container">
-      <el-card class="box-card">
+      <el-card v-loading="loading"  class="box-card">
         <!-- 头部 -->
         <treeToos
           :isRoot="true"
@@ -15,12 +15,18 @@
               :treeNode="scoped.data"
               @remove="loadDepts"
               @add="addFn"
+              @edit="editFn"
             ></treeToos>
           </template>
         </el-tree>
       </el-card>
     </div>
-    <addDept @addSuccess="addSuccessFn" :visible.sync="dialogVisible" :currentNode="currentNode"></addDept>
+    <addDept
+    ref="addDept"
+      @addSuccess="addSuccessFn"
+      :visible.sync="dialogVisible"
+      :currentNode="currentNode"
+    ></addDept>
   </div>
 </template>
 
@@ -42,7 +48,8 @@ export default {
       },
       company: { name: '传智教育', manager: '负责人' },
       dialogVisible: false,
-      currentNode: {}
+      currentNode: {},
+      loading: false,
     }
   },
   components: {
@@ -56,16 +63,23 @@ export default {
 
   methods: {
     async loadDepts() {
+      this.loading= true
       const res = await getDeptsApi()
       this.treeDate = transListToTree(res.depts, '')
+      this.loading= false
     },
     addFn(val) {
       this.dialogVisible = true
       this.currentNode = val
     },
-    addSuccessFn(){
+    addSuccessFn() {
       this.loadDepts()
-    }
+    },
+    editFn(val) {
+      // this.currentNode = val
+      this.dialogVisible = true
+      this.$refs.addDept.getDeptById(val.id)
+    },
   },
 }
 </script>
