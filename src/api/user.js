@@ -20,3 +20,4 @@ export const getUserDatail = (id) => {
     url: '/sys/user/' + id,
   })
 }
+

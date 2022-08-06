@@ -1,20 +1,72 @@
 <template>
   <div class="dashboard-container">
     <div class="app-container">
-      <h2>组织架构</h2>
+      <el-card class="box-card">
+        <!-- 头部 -->
+        <treeToos
+          :isRoot="true"
+          :treeNode="company"
+          @add="dialogVisible = true"
+        ></treeToos>
+        <!-- 树形结构 -->
+        <el-tree :data="treeDate" :props="defaultProps" default-expand-all>
+          <template v-slot="scoped">
+            <treeToos
+              :treeNode="scoped.data"
+              @remove="loadDepts"
+              @add="addFn"
+            ></treeToos>
+          </template>
+        </el-tree>
+      </el-card>
     </div>
+    <addDept @addSuccess="addSuccessFn" :visible.sync="dialogVisible" :currentNode="currentNode"></addDept>
   </div>
 </template>
 
 <script>
+import treeToos from './component/tree-toos'
+import addDept from './component/add-dept'
+import { getDeptsApi } from '@/api/departments'
+import { transListToTree } from '@/utils'
 export default {
   data() {
-    return {}
+    return {
+      treeDate: [
+        { name: '总裁办', children: [{ name: '董事会' }] },
+        { name: '行政部' },
+        { name: '人事部' },
+      ],
+      defaultProps: {
+        label: 'name',
+      },
+      company: { name: '传智教育', manager: '负责人' },
+      dialogVisible: false,
+      currentNode: {}
+    }
+  },
+  components: {
+    treeToos,
+    addDept,
   },
 
-  created() {},
+  created() {
+    this.loadDepts()
+  },
 
-  methods: {}
+  methods: {
+    async loadDepts() {
+      const res = await getDeptsApi()
+      this.treeDate = transListToTree(res.depts, '')
+    },
+    addFn(val) {
+      this.dialogVisible = true
+      this.currentNode = val
+    },
+    addSuccessFn(){
+      this.loadDepts()
+    }
+  },
 }
 </script>
 
