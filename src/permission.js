@@ -2,12 +2,12 @@ import router from '@/router'
 import store from '@/store'
 // 路由前置守卫
 const whiteList = ['/login', '/404']
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = store.state.user.token
   //   判断是否登录
   if (token) {
     if (!store.state.user.userInfo.userId) {
-      store.dispatch('user/getuserInfo')
+      await store.dispatch('user/getuserInfo')
     }
     if (to.path === '/login') {
       //如果登录了 不能进入登录页
