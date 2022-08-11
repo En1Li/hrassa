@@ -178,7 +178,7 @@ export default {
       }
     },
     async getDeptById(id) {
-      // console.log(this.currentNode);
+      console.log(this.currentNode);
       this.formData = await getDeptById(id)
     },
   },

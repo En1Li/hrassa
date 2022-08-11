@@ -76,7 +76,7 @@ export default {
       this.loadDepts()
     },
     editFn(val) {
-      // this.currentNode = val
+      this.currentNode = val
       this.dialogVisible = true
       this.$refs.addDept.getDeptById(val.id)
     },
