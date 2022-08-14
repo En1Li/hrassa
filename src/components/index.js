@@ -1,5 +1,6 @@
 import PageTools from '@/components/PageTools'
-const conpoments = [PageTools]
+import UploadExcel from './UploadExcel'
+const conpoments = [PageTools,UploadExcel]
 export default {
   install(Vue) {
     conpoments.forEach((component) => {
