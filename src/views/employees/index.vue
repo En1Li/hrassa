@@ -4,8 +4,15 @@
       <PageTools :show-before="true">
         <span slot="left-tag">共166条记录</span>
         <template slot="right">
-          <el-button size="small" type="warning" @click="$router.push('/import')">导入</el-button>
-          <el-button size="small" type="danger">导出</el-button>
+          <el-button
+            size="small"
+            type="warning"
+            @click="$router.push('/import')"
+            >导入</el-button
+          >
+          <el-button size="small" type="danger" @click="exportOut"
+            >导出</el-button
+          >
           <el-button size="small" type="primary" @click="addEmploy"
             >新增员工</el-button
           >
@@ -27,6 +34,7 @@
                   height: 100px;
                   padding: 10px;
                 "
+                @click="showErcodeDialog(row.staffPhoto)"
               />
             </template>
           </el-table-column>
@@ -56,7 +64,12 @@
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
             <template v-slot="{ row }">
-              <el-button type="text" size="small">查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="$router.push('/employees/detail/' + row.id)"
+                >查看</el-button
+              >
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
@@ -89,12 +102,17 @@
       @on-success="getemployeesInfo"
       :visible.sync="addEmployVisible"
     ></addEmployee>
+    <el-dialog title="头像二维码" :visible.sync="dialogVisible">
+      <canvas id="canvas"></canvas>
+    </el-dialog>
   </div>
 </template>
 <script>
 import { getemployeesInfo, delEmployee } from '@/api/employees'
 import employees from '@/constant/employees'
+const { exportExcelMapPath, hireType } = employees
 import addEmployee from './component/addEmploy.vue'
+import QRcode from 'qrcode'
 export default {
   data() {
     return {
@@ -105,6 +123,7 @@ export default {
         size: 5,
       },
       addEmployVisible: false,
+      dialogVisible: false,
     }
   },
   components: {
@@ -138,6 +157,42 @@ export default {
     },
     addEmploy() {
       this.addEmployVisible = true
+    },
+    async exportOut() {
+      const { rows } = await getemployeesInfo({
+        page: 1,
+        size: this.total,
+      })
+      const header = Object.keys(exportExcelMapPath)
+      const data = rows.map((item) => {
+        return header.map((h) => {
+          if (h === '聘用形式') {
+            const findItem = hireType.find((hire) => {
+              return hire.id === item[exportExcelMapPath[h]]
+            })
+            return findItem ? findItem.value : '位置'
+          } else {
+            return item[exportExcelMapPath[h]]
+          }
+        })
+      })
+      await import('@/vendor/Export2Excel').then((excel) => {
+        excel.export_json_to_excel({
+          header, //表头 必填
+          data, //具体数据 必填
+          filename: 'excel-list', //非必填
+          autoWidth: true, //非必填
+          bookType: 'xlsx', //非必填
+        })
+      })
+    },
+    showErcodeDialog(img) {
+      if (!img) return this.$message.error('该用户没有设置头像')
+      this.dialogVisible = true
+      this.$nextTick(() => {
+        var canvas = document.getElementById('canvas')
+        QRcode.toCanvas(canvas, img)
+      })
     },
   },
 }

@@ -20,4 +20,14 @@ export const getUserDatail = (id) => {
     url: '/sys/user/' + id,
   })
 }
-
+/** *
+ *
+ * 保存员工的基本信息
+ * **/
+export function saveUserDetailById(data) {
+  return request({
+    url: `/sys/user/${data.id}`,
+    method: 'put',
+    data,
+  })
+}

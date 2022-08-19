@@ -25,6 +25,9 @@ for (let key in filter) {
   Vue.filter(key, filter[key])
 }
 
+import Print from 'vue-print-nb'
+// Global instruction
+Vue.use(Print)
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

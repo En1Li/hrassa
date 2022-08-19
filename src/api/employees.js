@@ -35,12 +35,30 @@ export function addEmployee(data) {
   })
 }
 
-
 // 批量导入员工
-export function importEmployees(data){
+export function importEmployees(data) {
   return request({
     method: 'POST',
-    url:'/sys/user/batch',
-    data
+    url: '/sys/user/batch',
+    data,
+  })
+}
+
+/** *
+ *  读取用户详情的基础信息
+ * **/
+export function getPersonalDetail(id) {
+  return request({
+    url: `/employees/${id}/personalInfo`,
+  })
+}
+/** *
+ *  更新用户详情的基础信息
+ * **/
+export function updatePersonal(data) {
+  return request({
+    url: `/employees/${data.userId}/personalInfo`,
+    method: 'put',
+    data,
   })
 }
