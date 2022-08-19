@@ -10,7 +10,9 @@
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
               <template>
-                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="success" @click="setAssign"
+                  >分配权限</el-button
+                >
                 <el-button size="small" type="primary">编辑</el-button>
                 <el-button size="small" type="danger">删除</el-button>
               </template>
@@ -39,7 +41,10 @@
               <el-input disabled v-model="compantInfo.name"></el-input>
             </el-form-item>
             <el-form-item label="公司地址">
-              <el-input disabled v-model="compantInfo.companyAddress"></el-input>
+              <el-input
+                disabled
+                v-model="compantInfo.companyAddress"
+              ></el-input>
             </el-form-item>
             <el-form-item label="公司邮箱">
               <el-input disabled v-model="compantInfo.mailbox"></el-input>
@@ -77,12 +82,31 @@
         <el-button type="primary" @click="onaddRoles">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配权限 -->
+    <el-dialog title="权限分配" :visible.sync="dialogVisibleSet" width="30%">
+      <el-tree
+        :data="permissions"
+        :props="{ label: 'name' }"
+        node-key="id"
+        default-expand-all
+        show-checkbox
+        :default-checked-keys="defaultCheckKeys"
+        @node-click="handleNodeClick"
+      ></el-tree>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisibleSet = false">取 消</el-button>
+        <el-button type="primary">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getRolesList, addRole } from '@/api/roles'
-import {getCompanyInfo} from '@/api/setting'
+import { getCompanyInfo } from '@/api/setting'
+import { getPermissionList } from '@/api/permission'
+import { transListToTree } from '@/utils'
 export default {
   data() {
     return {
@@ -92,22 +116,26 @@ export default {
       total: 0,
       pagesize: 3,
       dialogVisible: false,
+      dialogVisibleSet: false,
       addRoleForm: {
         name: '',
         description: '',
       },
-      compantInfo:{},
+      compantInfo: {},
       addRoleFormRules: {
         name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
         description: [
           { required: true, message: '请输入角色描述', trigger: 'blur' },
         ],
       },
+      permissions: [],
+      defaultCheckKeys:['1']
     }
   },
 
   created() {
     this.getRolesList(), this.getCompanyInfo()
+    this.getPermissionList()
   },
 
   methods: {
@@ -147,6 +175,16 @@ export default {
       )
       this.compantInfo = res
       console.log(res)
+    },
+    setAssign() {
+      this.dialogVisibleSet = true
+    },
+    async getPermissionList() {
+      const res = await getPermissionList()
+
+      const treePermission = transListToTree(res, '0')
+      // console.log(treePermission)
+      this.permissions = treePermission
     },
   },
 }

@@ -73,7 +73,12 @@
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small">角色</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="showAssignRole(row.id)"
+                >角色</el-button
+              >
               <el-button type="text" size="small" @click="delEmploy(row.id)"
                 >删除</el-button
               >
@@ -105,11 +110,13 @@
     <el-dialog title="头像二维码" :visible.sync="dialogVisible">
       <canvas id="canvas"></canvas>
     </el-dialog>
+    <AssignRole :visible.sync="visible" :currentRow="currentRow"></AssignRole>
   </div>
 </template>
 <script>
 import { getemployeesInfo, delEmployee } from '@/api/employees'
 import employees from '@/constant/employees'
+import AssignRole from './component/assign-role.vue'
 const { exportExcelMapPath, hireType } = employees
 import addEmployee from './component/addEmploy.vue'
 import QRcode from 'qrcode'
@@ -124,10 +131,13 @@ export default {
       },
       addEmployVisible: false,
       dialogVisible: false,
+      visible: false,
+      currentRow: '',
     }
   },
   components: {
     addEmployee,
+    AssignRole,
   },
 
   created() {
@@ -193,6 +203,10 @@ export default {
         var canvas = document.getElementById('canvas')
         QRcode.toCanvas(canvas, img)
       })
+    },
+    showAssignRole(id) {
+      this.visible = true
+      this.currentRow = id
     },
   },
 }
