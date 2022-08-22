@@ -3,14 +3,22 @@
     <div class="app-container">
       <el-tabs v-model="activeName">
         <el-tab-pane label="角色管理" name="first">
-          <el-button @click="add" type="primary">新增角色</el-button>
+          <el-button
+            @click="add"
+            type="primary"
+            :disabled="idHas(point.roles.add)"
+            >新增角色</el-button
+          >
           <el-table :data="tableData" style="width: 100%">
             <el-table-column type="index" label="序号"> </el-table-column>
             <el-table-column prop="name" label="角色"> </el-table-column>
             <el-table-column prop="description" label="描述"> </el-table-column>
             <el-table-column prop="address" label="操作">
-              <template>
-                <el-button size="small" type="success" @click="setAssign"
+              <template v-slot="scoped">
+                <el-button
+                  size="small"
+                  type="success"
+                  @click="setAssign(scoped.row.id)"
                   >分配权限</el-button
                 >
                 <el-button size="small" type="primary">编辑</el-button>
@@ -83,7 +91,12 @@
       </span>
     </el-dialog>
     <!-- 分配权限 -->
-    <el-dialog title="权限分配" :visible.sync="dialogVisibleSet" width="30%">
+    <el-dialog
+      title="权限分配"
+      :visible.sync="dialogVisibleSet"
+      width="30%"
+      @close="setClose"
+    >
       <el-tree
         :data="permissions"
         :props="{ label: 'name' }"
@@ -91,22 +104,24 @@
         default-expand-all
         show-checkbox
         :default-checked-keys="defaultCheckKeys"
-        @node-click="handleNodeClick"
+        v-if="dialogVisibleSet"
+        ref="perTree"
       ></el-tree>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisibleSet = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="onSaveRight">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRolesList, addRole } from '@/api/roles'
+import { getRolesList, addRole, getRolesInfo, assignPerm } from '@/api/roles'
 import { getCompanyInfo } from '@/api/setting'
 import { getPermissionList } from '@/api/permission'
 import { transListToTree } from '@/utils'
+import Mixins from '@/mixins/permissions'
 export default {
   data() {
     return {
@@ -129,9 +144,11 @@ export default {
         ],
       },
       permissions: [],
-      defaultCheckKeys:['1']
+      defaultCheckKeys: [],
+      roleID: '',
     }
   },
+  mixins: [Mixins],
 
   created() {
     this.getRolesList(), this.getCompanyInfo()
@@ -176,8 +193,11 @@ export default {
       this.compantInfo = res
       console.log(res)
     },
-    setAssign() {
+    async setAssign(id) {
+      this.roleID = id
       this.dialogVisibleSet = true
+      const res = await getRolesInfo(id)
+      this.defaultCheckKeys = res.permIds
     },
     async getPermissionList() {
       const res = await getPermissionList()
@@ -185,6 +205,18 @@ export default {
       const treePermission = transListToTree(res, '0')
       // console.log(treePermission)
       this.permissions = treePermission
+    },
+    setClose() {
+      this.defaultCheckKeys = []
+    },
+    async onSaveRight() {
+      console.log(1234)
+      await assignPerm({
+        id: this.roleID,
+        permIds: this.$refs.perTree.getCheckedKeys(),
+      })
+      this.$message.success('分配成功')
+      this.dialogVisibleSet = false
     },
   },
 }

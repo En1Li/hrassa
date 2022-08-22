@@ -1,13 +1,17 @@
-import router from '@/router'
+import router, { asyncRoutes } from '@/router'
 import store from '@/store'
 // 路由前置守卫
 const whiteList = ['/login', '/404']
 router.beforeEach(async (to, from, next) => {
   const token = store.state.user.token
+  console.log(store.state.user.userInfo.userId)
   //   判断是否登录
   if (token) {
     if (!store.state.user.userInfo.userId) {
-      await store.dispatch('user/getuserInfo')
+      const { roles } = await store.dispatch('user/getuserInfo')
+      await store.dispatch('permission/filtreRouter', roles)
+      await store.dispatch('permission/setPointsAction' , roles.points)
+      next(to.path)
     }
     if (to.path === '/login') {
       //如果登录了 不能进入登录页

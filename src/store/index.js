@@ -4,6 +4,7 @@ import getters from './getters'
 import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
+import permission from './modules/permission'
 import persistedState from 'vuex-persistedstate'
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ const store = new Vuex.Store({
     app,
     settings,
     user,
+    permission
   },
   getters,
   plugins: [
@@ -22,7 +24,6 @@ const store = new Vuex.Store({
           user: {
             //user模块名
             token: state.user.token, //要存的键值对 名字要一致 插件会自动找
-            userInfo: state.user.userInfo,
           },
         }
       },

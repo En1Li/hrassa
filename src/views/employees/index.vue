@@ -8,12 +8,17 @@
             size="small"
             type="warning"
             @click="$router.push('/import')"
+            v-isHas="point.employees.import"
             >导入</el-button
           >
           <el-button size="small" type="danger" @click="exportOut"
             >导出</el-button
           >
-          <el-button size="small" type="primary" @click="addEmploy"
+          <el-button
+            :disabled="idHas(point.employees.add)"
+            size="small"
+            type="primary"
+            @click="addEmploy"
             >新增员工</el-button
           >
         </template>
@@ -79,7 +84,11 @@
                 @click="showAssignRole(row.id)"
                 >角色</el-button
               >
-              <el-button type="text" size="small" @click="delEmploy(row.id)"
+              <el-button
+                :disabled="idHas(point.employees.del)"
+                type="text"
+                size="small"
+                @click="delEmploy(row.id)"
                 >删除</el-button
               >
             </template>
@@ -120,6 +129,7 @@ import AssignRole from './component/assign-role.vue'
 const { exportExcelMapPath, hireType } = employees
 import addEmployee from './component/addEmploy.vue'
 import QRcode from 'qrcode'
+import employeesPoint from '@/constant/permission'
 export default {
   data() {
     return {
@@ -133,6 +143,7 @@ export default {
       dialogVisible: false,
       visible: false,
       currentRow: '',
+      point: employeesPoint,
     }
   },
   components: {
@@ -207,6 +218,10 @@ export default {
     showAssignRole(id) {
       this.visible = true
       this.currentRow = id
+    },
+    idHas(point) {
+      const flag = this.$store.state.permission.points.includes(point)
+      return !flag
     },
   },
 }
