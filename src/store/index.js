@@ -5,7 +5,8 @@ import app from './modules/app'
 import settings from './modules/settings'
 import user from './modules/user'
 import permission from './modules/permission'
-import persistedState from 'vuex-persistedstate'
+import createVuexPersisted from 'vuex-persistedstate'
+import tagsView from './modules/tagsView'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -13,17 +14,16 @@ const store = new Vuex.Store({
     app,
     settings,
     user,
-    permission
+    permission,
+    tagsView,
   },
   getters,
   plugins: [
-    persistedState({
+    createVuexPersisted({
       reducer(state) {
         return {
-          // return 出来的就是要存到localstorage里面的
           user: {
-            //user模块名
-            token: state.user.token, //要存的键值对 名字要一致 插件会自动找
+            token: state.user.token,
           },
         }
       },

@@ -48,24 +48,27 @@ export default {
   & .sidebar-logo-link {
     height: 100%;
     width: 100%;
-  }
-  .sidebar-logo {
-    width: 140px;
-    vertical-align: middle;
-    margin-right: 12px;
+
+    // 大图样式
+    .sidebar-logo {
+      width: 140px;
+      vertical-align: middle;
+      margin-right: 12px;
+    }
+
+    & .sidebar-title {
+      display: inline-block;
+      margin: 0;
+      color: #fff;
+      font-weight: 600;
+      line-height: 50px;
+      font-size: 14px;
+      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+      vertical-align: middle;
+    }
   }
 
-  & .sidebar-title {
-    display: inline-block;
-    margin: 0;
-    color: #fff;
-    font-weight: 600;
-    line-height: 50px;
-    font-size: 14px;
-    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
-    vertical-align: middle;
-  }
-
+  // 小图样式
   &.collapse {
     .sidebar-logo {
       margin-right: 0px;

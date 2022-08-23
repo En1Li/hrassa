@@ -147,7 +147,7 @@ export function export_table_to_excel(id) {
     new Blob([s2ab(wbout)], {
       type: 'application/octet-stream',
     }),
-    'test.xlsx',
+    'test.xlsx'
   )
 }
 
@@ -190,7 +190,7 @@ export function export_json_to_excel({
             wch: 10,
           }
         } else if (val.toString().charCodeAt(0) > 255) {
-        /*再判断是否为中文*/
+          /*再判断是否为中文*/
           return {
             wch: val.toString().length * 2,
           }
@@ -199,7 +199,7 @@ export function export_json_to_excel({
             wch: val.toString().length,
           }
         }
-      }),
+      })
     )
     /*以第一行为初始值*/
     let result = colWidth[0]
@@ -226,6 +226,6 @@ export function export_json_to_excel({
     new Blob([s2ab(wbout)], {
       type: 'application/octet-stream',
     }),
-    `${filename}.${bookType}`,
+    `${filename}.${bookType}`
   )
 }

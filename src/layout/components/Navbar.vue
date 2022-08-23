@@ -11,8 +11,9 @@
       {{ $store.state.user.userInfo.companyName }}
       <span class="breadBtn">体验版</span>
     </div>
-
     <div class="right-menu">
+      <FullScreen></FullScreen>
+      <ToggleLang></ToggleLang>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img
@@ -27,7 +28,6 @@
           <router-link to="/">
             <el-dropdown-item> Home </el-dropdown-item>
           </router-link>
-
           <el-dropdown-item divided @click.native="logout">
             <span style="display: block">Log Out</span>
           </el-dropdown-item>
@@ -44,9 +44,10 @@ import Hamburger from '@/components/Hamburger'
 import defaultImg from '@/assets/common/head.jpg'
 
 export default {
+  // 如果想在data中定义本地图片路径,需要先引入
   data() {
     return {
-      defaultImg: defaultImg,
+      defaultImg,
     }
   },
   components: {
@@ -145,12 +146,15 @@ export default {
       margin-right: 30px;
 
       .avatar-wrapper {
-        // margin-top: 5px;
         position: relative;
         display: flex;
         align-items: center;
         color: #fff;
         cursor: pointer;
+
+        span {
+          margin: 0 3px;
+        }
 
         .user-avatar {
           cursor: pointer;
@@ -163,7 +167,6 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          // top: 25px;
           font-size: 12px;
         }
       }

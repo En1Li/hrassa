@@ -4,12 +4,13 @@ export default {
   component: Layout,
   hidden: true,
   meta: {
-    id: 'import',
+    id: 'import', // 用来和后端权限做约定的
   },
   children: [
     {
       path: '',
       component: () => import('@/views/import'),
+      meta: { title: '员工', icon: 'people' },
     },
   ],
 }
